@@ -25,13 +25,13 @@ public class SignalHouse : MonoBehaviour
         if (isPlay)
         {
             target = 1f;
-            _coroutine = StartCoroutine(ChangeVolume(target, isPlay));
         }
         else
         {
             target = 0f;
-            _coroutine = StartCoroutine(ChangeVolume(target, isPlay));
         }
+
+        _coroutine = StartCoroutine(ChangeVolume(target, isPlay));
     }
 
     private IEnumerator ChangeVolume(float target, bool isPlay)
