@@ -13,8 +13,10 @@ public class SignalHouse : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
     }
 
-    public void isSignal(float target, bool isPlay)
+    public void isSignal(bool isPlay)
     {
+        float target;
+
         if (_coroutine != null)
         {
             StopCoroutine(_coroutine);
@@ -22,38 +24,35 @@ public class SignalHouse : MonoBehaviour
 
         if (isPlay)
         {
-            _coroutine = StartCoroutine(Enabling(target));
+            target = 1f;
+            _coroutine = StartCoroutine(ChangeVolume(target, isPlay));
         }
         else
         {
-            _coroutine = StartCoroutine(Shutdown(target));
+            target = 0f;
+            _coroutine = StartCoroutine(ChangeVolume(target, isPlay));
         }
     }
 
-    private IEnumerator Enabling(float target)
+    private IEnumerator ChangeVolume(float target, bool isPlay)
     {
         var downtime = new WaitForSeconds(1f);
-        _audioSource.Play();
 
-        while (_audioSource.volume < target)
+        if (isPlay == true)
         {
-            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, target, stepVolume);
-
-            yield return downtime;
+            _audioSource.Play();
         }
-    }
 
-    private IEnumerator Shutdown(float target)
-    {
-        var downtime = new WaitForSeconds(1f);
-
-        while (_audioSource.volume > target)
+        while (_audioSource.volume != target)
         {
             _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, target, stepVolume);
 
             yield return downtime;
         }
 
-        _audioSource.Stop();
+        if (isPlay == false)
+        {
+            _audioSource.Stop();
+        }
     }
 }
