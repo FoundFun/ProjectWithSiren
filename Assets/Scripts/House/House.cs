@@ -14,7 +14,7 @@ public class House : MonoBehaviour
     {
         if (other.TryGetComponent(out Player player))
         {
-            _signal.Play();
+            _signal.isSignal(1f, true);
         }
     }
 
@@ -22,7 +22,7 @@ public class House : MonoBehaviour
     {
         if (other.TryGetComponent(out Player player))
         {
-            _signal.Stop();
+            _signal.isSignal(0f, false);
         }
     }
 }

@@ -1,46 +1,59 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
 public class SignalHouse : MonoBehaviour
 {
     private AudioSource _audioSource;
-    private bool _isPlay;
+    private Coroutine _coroutine;
+    private float stepVolume = 0.1f;
 
     private void Start()
     {
         _audioSource = GetComponent<AudioSource>();
     }
 
-    private void Update()
+    public void isSignal(float target, bool isPlay)
     {
-        if (_isPlay == true)
+        if (_coroutine != null)
         {
-            ChangeSound(1);
+            StopCoroutine(_coroutine);
         }
-        else if (_isPlay == false && _audioSource.volume > 0)
+
+        if (isPlay)
         {
-            ChangeSound(-1);
+            _coroutine = StartCoroutine(Enabling(target));
+        }
+        else
+        {
+            _coroutine = StartCoroutine(Shutdown(target));
         }
     }
 
-    private void ChangeSound(int polarity)
+    private IEnumerator Enabling(float target)
     {
-        _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, 1, 0.1f * Time.deltaTime * polarity);
-    }
-
-    public void Play()
-    {
-        _isPlay = true;
+        var downtime = new WaitForSeconds(1f);
         _audioSource.Play();
+
+        while (_audioSource.volume < target)
+        {
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, target, stepVolume);
+
+            yield return downtime;
+        }
     }
 
-    public void Stop()
+    private IEnumerator Shutdown(float target)
     {
-        _isPlay = false;
+        var downtime = new WaitForSeconds(1f);
 
-        if (_audioSource.volume == 0)
+        while (_audioSource.volume > target)
         {
-            _audioSource.Stop();
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, target, stepVolume);
+
+            yield return downtime;
         }
+
+        _audioSource.Stop();
     }
 }
